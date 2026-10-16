@@ -1,0 +1,11 @@
+# Let's generate QR code images for tables 1 to 5 using qrcode library or online public API / URL generator to help the user.
+# Since we don't have qrcode installed directly in standard python unless imported, let's write a python script to verify or generate QR codes using a public QR code API image link or text representation.
+# Actually, we can generate markdown image links using the public QR API: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=...`
+
+tables = [1, 2, 3, 4, 5]
+base_url = "https://your-restaurant-name.netlify.app"
+
+for t in tables:
+    table_url = f"{base_url}/?table={t}"
+    qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={table_url}"
+    print(f"Table {t}: {qr_api}")
