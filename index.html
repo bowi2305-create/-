@@ -26,6 +26,452 @@
         .nav-pills .nav-link {
             color: #333;
             font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .card-menu {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .card-menu:hover {
+            transform: translateY(-2px);
+        }
+        .btn-custom {
+            background-color: #d9534f;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #c9302c;
+            color: white;
+        }
+        .cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 12px 20px;
+            z-index: 1000;
+        }
+        .badge-count {
+            background-color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Banner -->
+    <div class="header-banner text-center mb-3">
+        <h2 class="fw-bold mb-1"><i class="fa-solid fa-utensils me-2"></i>ร้านไก่ย่าง ส้มตำ ปลาเผา</h2>
+        <p class="mb-1">ชุมชนบ้านโตนด ต.หนองระเวียง อ.เมือง จ.นครราชสีมา</p>
+        <div class="badge bg-warning text-dark fs-6" id="table-display">โต๊ะที่: กำหนดเมื่อสแกน</div>
+    </div>
+
+    <div class="container">
+        <!-- Categories -->
+        <ul class="nav nav-pills nav-fill mb-3 bg-white p-2 rounded-3 shadow-sm gap-1" id="categoryTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">ทั้งหมด</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="somtum-tab" data-bs-toggle="tab" data-bs-target="#somtum" type="button">ส้มตำ/ลาบ</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="grill-tab" data-bs-toggle="tab" data-bs-target="#grill" type="button">ย่าง/เผา</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="fried-tab" data-bs-toggle="tab" data-bs-target="#fried" type="button">ของทอด</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="drink-tab" data-bs-toggle="tab" data-bs-target="#drink" type="button">ข้าว/น้ำ</button>
+            </li>
+        </ul>
+
+        <!-- Menu Container -->
+        <div class="row g-3" id="menu-list">
+            <!-- Dynamic Menu Items -->
+        </div>
+    </div>
+
+    <!-- Sticky Cart Bar -->
+    <div class="cart-bar d-flex justify-content-between align-items-center">
+        <div>
+            <span class="text-muted d-block small">ยอดรวมทั้งหมด</span>
+            <span class="fs-4 fw-bold text-danger" id="cart-total-price">0 ฿</span>
+        </div>
+        <button class="btn btn-custom px-4 py-2 rounded-pill fw-bold" onclick="openCartModal()">
+            <i class="fa-solid fa-cart-shopping me-2"></i>ดูตะกร้า <span class="badge badge-count rounded-circle ms-1" id="cart-count">0</span>
+        </button>
+    </div>
+
+    <!-- Modal Option / Add Item -->
+    <div class="modal fade" id="itemModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="itemModalLabel">รายละเอียดเมนู</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modal-item-id">
+                    <h4 id="modal-item-name" class="text-danger fw-bold"></h4>
+                    <p id="modal-item-price" class="text-muted"></p>
+                    
+                    <div id="option-spiciness" class="mb-3">
+                        <label class="form-label fw-bold">ระดับความเผ็ด:</label>
+                        <select class="form-select" id="spiciness-select">
+                            <option value="เผ็ดปกติ">เผ็ดปกติ</option>
+                            <option value="เผ็ดน้อย">เผ็ดน้อย</option>
+                            <option value="เผ็ดมาก">เผ็ดมาก</option>
+                            <option value="ไม่ใส่พริก">ไม่ใส่พริก</option>
+                        </select>
+                    </div>
+
+                    <div id="option-plara" class="mb-3">
+                        <label class="form-label fw-bold">ปลาร้า:</label>
+                        <select class="form-select" id="plara-select">
+                            <option value="ใส่ปลาร้า">ใส่ปลาร้า</option>
+                            <option value="ไม่ใส่ปลาร้า">ไม่ใส่ปลาร้า</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">หมายเหตุเพิ่มเติม:</label>
+                        <input type="text" class="form-control" id="modal-note" placeholder="เช่น ไม่หวาน, ไม่ใส่ชูรส">
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-center gap-3 my-3">
+                        <button class="btn btn-outline-secondary rounded-circle" onclick="changeQty(-1)"><i class="fa-solid fa-minus"></i></button>
+                        <span class="fs-4 fw-bold" id="modal-qty">1</span>
+                        <button class="btn btn-outline-secondary rounded-circle" onclick="changeQty(1)"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-custom w-100 fw-bold py-2" onclick="addToCartFromModal()">เพิ่มลงตะกร้า</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cart & Checkout -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-receipt me-2"></i>รายการอาหารของคุณ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">หมายเลขโต๊ะ:</label>
+                        <select class="form-select" id="table-select" onchange="updateTableNumber()">
+                            <option value="1">โต๊ะ 1</option>
+                            <option value="2">โต๊ะ 2</option>
+                            <option value="3">โต๊ะ 3</option>
+                            <option value="4">โต๊ะ 4</option>
+                            <option value="5">โต๊ะ 5</option>
+                            <option value="กลับบ้าน">สั่งกลับบ้าน (Takeaway)</option>
+                        </select>
+                    </div>
+                    <hr>
+                    <div id="cart-items-list" class="mb-3">
+                        <!-- Items rendered here -->
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold fs-5 border-top pt-2">
+                        <span>ยอดรวมสุทธิ:</span>
+                        <span class="text-danger" id="cart-modal-total">0 ฿</span>
+                    </div>
+                </div>
+                <div class="modal-footer flex-column">
+                    <button class="btn btn-success w-100 fw-bold py-2 mb-2" onclick="showPaymentModal()">
+                        <i class="fa-solid fa-qrcode me-2"></i>สแกนจ่ายผ่าน PromptPay
+                    </button>
+                    <button class="btn btn-outline-dark w-100 fw-bold py-2" onclick="placeOrderCash()">
+                        <i class="fa-solid fa-money-bill-wave me-2"></i>สั่งอาหาร (ชำระเงินสดที่เคาน์เตอร์)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Payment PromptPay -->
+    <div class="modal fade" id="paymentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered text-center">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-success"><i class="fa-solid fa-qrcode me-2"></i>ชำระเงินผ่าน พร้อมเพย์ (PromptPay)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-1 fw-bold">ร้านไก่ย่าง ส้มตำ ปลาเผา (บ้านโตนด)</p>
+                    <p class="text-muted small">สแกน QR Code ด้านล่างเพื่อโอนเงินชำระค่าอาหาร</p>
+                    <div class="my-3 p-3 bg-white d-inline-block border rounded shadow-sm">
+                        <img id="promptpay-qr" src="" alt="PromptPay QR Code" class="img-fluid" style="max-width: 220px;">
+                    </div>
+                    <h3 class="fw-bold text-danger mb-3" id="payment-amount">0 ฿</h3>
+                    <p class="text-muted small">เมื่อโอนเรียบร้อยแล้ว กดปุ่ม "ยืนยันการชำระเงิน" ด้านล่าง</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success w-100 fw-bold py-2" onclick="confirmPayment()">
+                        <i class="fa-solid fa-circle-check me-2"></i>ยืนยันการชำระเงิน & ส่งออเดอร์
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Success -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered text-center">
+            <div class="modal-content p-4">
+                <div class="text-success display-1 mb-2"><i class="fa-solid fa-circle-check"></i></div>
+                <h3 class="fw-bold mb-2">ส่งรายการอาหารเรียบร้อย!</h3>
+                <p class="text-muted" id="success-message">ห้องครัวกำลังจัดเตรียมอาหารให้ท่าน กรุณารอครู่นะครับ</p>
+                <button class="btn btn-primary fw-bold mt-3" data-bs-dismiss="modal" onclick="resetCart()">ทำรายการใหม่</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Menu Data with accurate images
+        const menuData = [
+            { id: 1, name: 'ส้มตำไทย', category: 'somtum', price: 40, image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=400&q=80', hasOptions: true },
+            { id: 2, name: 'ส้มตำปูปลาร้า', category: 'somtum', price: 40, image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80', hasOptions: true },
+            { id: 3, name: 'ตำป่า / ตำซั่ว', category: 'somtum', price: 50, image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=400&q=80', hasOptions: true },
+            { id: 4, name: 'ลาบหมู / น้ำตกหมู', category: 'somtum', price: 70, image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 5, name: 'ไก่ย่างหมักสูตรเด็ด (ครึ่งตัว)', category: 'grill', price: 90, image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 6, name: 'ไก่ย่างหมักสูตรเด็ด (ตัวละ)', category: 'grill', price: 170, image: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 7, name: 'ปลาทับทิมเผา + ชุดผักน้ำจิ้ม', category: 'grill', price: 160, image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 8, name: 'ปีกไก่ทอดเกลือ', category: 'fried', price: 70, image: 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 9, name: 'หมูแดดเดียวทอด / สามชั้นทอด', category: 'fried', price: 80, image: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 10, name: 'เนื้อแดดเดียวทอด', category: 'fried', price: 90, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 11, name: 'ไข่เจียวหมูสับ', category: 'fried', price: 50, image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 12, name: 'ข้าวเหนียว', category: 'drink', price: 10, image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 13, name: 'ขนมจีน (จาน)', category: 'drink', price: 10, image: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 14, name: 'น้ำโค้ก / น้ำใส (ขวดใหญ่)', category: 'drink', price: 30, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80', hasOptions: false },
+            { id: 15, name: 'น้ำเปล่า + น้ำแข็ง', category: 'drink', price: 15, image: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=400&q=80', hasOptions: false }
+        ];
+
+        let cart = [];
+        let selectedItem = null;
+        let currentQty = 1;
+        let promptPayNumber = "0812345678";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMenu('all');
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const tableParam = urlParams.get('table');
+            if (tableParam) {
+                document.getElementById('table-select').value = tableParam;
+                updateTableNumber();
+            } else {
+                updateTableNumber();
+            }
+
+            document.querySelectorAll('#categoryTab button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const target = e.target.id.replace('-tab', '');
+                    renderMenu(target);
+                });
+            });
+        });
+
+        function updateTableNumber() {
+            const tableVal = document.getElementById('table-select').value;
+            document.getElementById('table-display').innerText = tableVal === 'กลับบ้าน' ? 'สั่งกลับบ้าน (Takeaway)' : 'โต๊ะที่: ' + tableVal;
+        }
+
+        function renderMenu(category) {
+            const container = document.getElementById('menu-list');
+            container.innerHTML = '';
+
+            const filtered = category === 'all' ? menuData : menuData.filter(item => item.category === category);
+
+            filtered.forEach(item => {
+                container.innerHTML += `
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card card-menu h-100">
+                            <img src="${item.image}" class="card-img-top" style="height: 120px; object-fit: cover; border-radius: 15px 15px 0 0;" alt="${item.name}">
+                            <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h6 class="fw-bold mb-1" style="font-size:0.95rem;">${item.name}</h6>
+                                    <p class="text-danger fw-bold mb-2">${item.price} ฿</p>
+                                </div>
+                                <button class="btn btn-sm btn-custom w-100 rounded-pill fw-bold" onclick="openItemModal(${item.id})">
+                                    <i class="fa-solid fa-plus me-1"></i> เลือก
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openItemModal(id) {
+            selectedItem = menuData.find(m => m.id === id);
+            currentQty = 1;
+            document.getElementById('modal-item-id').value = selectedItem.id;
+            document.getElementById('modal-item-name').innerText = selectedItem.name;
+            document.getElementById('modal-item-price').innerText = 'ราคา: ' + selectedItem.price + ' บาท';
+            document.getElementById('modal-qty').innerText = currentQty;
+            document.getElementById('modal-note').value = '';
+
+            if (selectedItem.hasOptions) {
+                document.getElementById('option-spiciness').style.display = 'block';
+                document.getElementById('option-plara').style.display = 'block';
+            } else {
+                document.getElementById('option-spiciness').style.display = 'none';
+                document.getElementById('option-plara').style.display = 'none';
+            }
+
+            const itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
+            itemModal.show();
+        }
+
+        function changeQty(delta) {
+            currentQty = Math.max(1, currentQty + delta);
+            document.getElementById('modal-qty').innerText = currentQty;
+        }
+
+        function addToCartFromModal() {
+            const spiciness = selectedItem.hasOptions ? document.getElementById('spiciness-select').value : '';
+            const plara = selectedItem.hasOptions ? document.getElementById('plara-select').value : '';
+            const note = document.getElementById('modal-note').value.trim();
+
+            let optionsText = [spiciness, plara, note].filter(Boolean).join(', ');
+
+            cart.push({
+                id: selectedItem.id,
+                name: selectedItem.name,
+                price: selectedItem.price,
+                qty: currentQty,
+                options: optionsText,
+                total: selectedItem.price * currentQty
+            });
+
+            updateCartUI();
+            bootstrap.Modal.getInstance(document.getElementById('itemModal')).hide();
+        }
+
+        function updateCartUI() {
+            const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+            const totalPrice = cart.reduce((sum, i) => sum + i.total, 0);
+
+            document.getElementById('cart-count').innerText = totalQty;
+            document.getElementById('cart-total-price').innerText = totalPrice + ' ฿';
+        }
+
+        function openCartModal() {
+            const container = document.getElementById('cart-items-list');
+            container.innerHTML = '';
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted py-3">ยังไม่มีรายการอาหารในตะกร้า</p>';
+            } else {
+                cart.forEach((item, index) => {
+                    container.innerHTML += `
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                            <div>
+                                <div class="fw-bold">${item.name} <span class="text-muted">x${item.qty}</span></div>
+                                <small class="text-muted">${item.options || '-'}</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold text-danger">${item.total} ฿</span>
+                                <button class="btn btn-sm btn-outline-danger border-0" onclick="removeFromCart(${index})">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            const totalPrice = cart.reduce((sum, i) => sum + i.total, 0);
+            document.getElementById('cart-modal-total').innerText = totalPrice + ' ฿';
+
+            const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+            cartModal.show();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+            openCartModal();
+        }
+
+        function showPaymentModal() {
+            if (cart.length === 0) {
+                alert('กรุณาเลือกรายการอาหารก่อนชำระเงิน');
+                return;
+            }
+
+            const totalPrice = cart.reduce((sum, i) => sum + i.total, 0);
+            document.getElementById('payment-amount').innerText = totalPrice + ' บาท';
+
+            const qrUrl = `https://promptpay.io/${promptPayNumber}/${totalPrice}.png`;
+            document.getElementById('promptpay-qr').src = qrUrl;
+
+            bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
+            const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            paymentModal.show();
+        }
+
+        function confirmPayment() {
+            bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+            document.getElementById('success-message').innerText = 'ชำระเงินสำเร็จแล้ว! รายการอาหารถูกส่งไปยังห้องครัวเรียบร้อยครับ';
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        }
+
+        function placeOrderCash() {
+            if (cart.length === 0) {
+                alert('กรุณาเลือกรายการอาหารก่อนสั่ง');
+                return;
+            }
+            bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
+            document.getElementById('success-message').innerText = 'ส่งรายการอาหารเข้าห้องครัวเรียบร้อยครับ กรุณาชำระเงินที่เคาน์เตอร์หลังจากรับประทานอาหารเสร็จ';
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        }
+
+        function resetCart() {
+            cart = [];
+            updateCartUI();
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ร้านไก่ย่าง ส้มตำ ปลาเผา - ชุมชนบ้านโตนด</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Krub', 'Kanit', sans-serif;
+            background-color: #f8f9fa;
+            padding-bottom: 80px;
+        }
+        .header-banner {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 30px 15px;
+            border-radius: 0 0 20px 20px;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #d9534f;
+        }
+        .nav-pills .nav-link {
+            color: #333;
+            font-weight: bold;
         }
         .card-menu {
             border: none;
