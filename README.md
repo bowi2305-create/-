@@ -1,7 +1,21 @@
 [index.html](https://github.com/user-attachments/files/33530547/index.html)
 # -
 ส้มตำ ไก่ย่าง ปลาเผา
-<!DOCTYPE html>
+<!DOCTYPE html># Let's update the HTML code to include the new "Fried items (ของทอด)" category with 
+# items: ปีกไก่ทอดเกลือ, แหนมทอด, เนื้อแดดเดียวทอด, หมูแดดเดียวทอด, ไข่เจียวหมูสับ
+# And generate the updated HTML code, plus the correct QR code images for tables 1 to 5 linked to the new GitHub pages URL.
+
+base_url = "https://bowi2305-create.github.io/-/"
+
+# Let's verify the QR codes with the exact GitHub Pages URL
+tables = [1, 2, 3, 4, 5]
+qr_links = {}
+for t in tables:
+    table_url = f"{base_url}?table={t}"
+    qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={table_url}"
+    qr_links[t] = qr_api
+
+print("QR links generated successfully.")
 <html lang="th">
 <head>
     <meta charset="UTF-8">
